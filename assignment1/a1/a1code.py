@@ -1,4 +1,3 @@
-
 ### Supporting code for Computer Vision Assignment 1
 ### See "Assignment 1.ipynb" for instructions
 
@@ -7,7 +6,8 @@ import math
 import numpy as np
 from skimage import io
 
-def load(img_path):
+
+def load (img_path):
     """Loads an image from a file path.
 
     HINT: Look up `skimage.io.imread()` function.
@@ -23,16 +23,25 @@ def load(img_path):
     out = None
 
     # read image by path
-    img_io = io.imread(img_path)
+    img_io = io.imread (img_path)
 
     # convert image to matrix
     # 创建数组，并将值控制在0~255之间
     np_img = np.array (img_io) / 255
+    # np_img = np.asarray (np_img, dtype=np.float32)
+    #
+    # width = np_img.shape[0]
+    # height = np_img.shape[1]
+    #
+    # for i in range (width):
+    #     for j in range (height):
+    #         np_img[i][j] = np_img[i][j] / 255
 
     out = np_img
     return out
 
-def print_stats(image):
+
+def print_stats (image):
     """ Prints the height, width and number of channels in an image.
         
     Inputs:
@@ -42,18 +51,21 @@ def print_stats(image):
                 
     """
     SHAPE = image.shape
-    
+
     # YOUR CODE HERE
-    # height
-    print(SHAPE[0])
-    # width
-    print(SHAPE[1])
-    # channels
-    print(SHAPE[2])
-    
+    # # height
+    # if SHAPE[0]: print (SHAPE[0])
+    # # width
+    # if SHAPE[1]: print (SHAPE[1])
+    # # channels
+    # if SHAPE[2]: print (SHAPE[2])
+
+    print (SHAPE)
+
     return None
 
-def crop(image, x1, y1, x2, y2):
+
+def crop (image, x1, y1, x2, y2):
     """Crop an image based on the specified bounds. Use array slicing.
 
     Inputs:
@@ -68,7 +80,7 @@ def crop(image, x1, y1, x2, y2):
 
     out = None
 
-    #crop the origin array
+    # crop the origin array
     #                  x1~x2    y1~y2   step=1
     crop_image = image[x1:x2:1, y1:y2:1]
 
@@ -76,8 +88,9 @@ def crop(image, x1, y1, x2, y2):
     ### YOUR CODE HERE
 
     return out
-    
-def resize(input_image, fx, fy):
+
+
+def resize (input_image, fx, fy):
     """Resize an image using the nearest neighbor method.
     Not allowed to call the matural function.
     i.e. for each output pixel, use the value of the nearest input pixel after scaling
@@ -93,12 +106,39 @@ def resize(input_image, fx, fy):
     """
     out = None
 
+    image = input_image.shape
 
-    
+    # get width and height
+    # 获取宽 高
+    height = image[0]
+    width = image[1]
+
+    # 将宽高转化成int类型，用于遍历
+    new_width = int (fx * width)
+    new_height = int (fy * height)
+
+    # create a new image
+    # 根据新的 高 ， 宽 创建全0矩阵
+    new_image = np.zeros ((new_height, new_width, 3))
+
+    # traverse
+    # 开始遍历
+    for i in range (new_height - 1):
+        for j in range (new_width - 1):
+            # get the nearest pixel in orginal image
+            # 获取在原始图片中最近的值
+            src_x = round ((i * (1 / fy)))
+            src_y = round ((j * (1 / fx)))
+
+            # 将获取到的值放入新的图片
+            new_image[i, j] = input_image[src_x, src_y]
+
+    out = new_image
+
     return out
 
 
-def change_contrast(image, factor):
+def change_contrast (image, factor):
     """Change the value of every pixel by following
 
                         x_n = factor * (x_p - 0.5) + 0.5
@@ -117,11 +157,13 @@ def change_contrast(image, factor):
 
     out = None
 
-    ### YOUR CODE HERE
+    new_image = factor * (image - 0.5) + 0.5
+    out = new_image
 
     return out
 
-def greyscale(input_image):
+
+def greyscale (input_image):
     """Convert a RGB image to greyscale. 
     A simple method is to take the average of R, G, B at each pixel.
     Or you can look up more sophisticated methods online.
@@ -133,11 +175,20 @@ def greyscale(input_image):
     Returns:
         np.ndarray: Greyscale image, with shape `(image_height, image_width)`.
     """
+
+    # GRAY = 0.3 * R + 0.59 * G + 0.11 * B
+
     out = None
 
+    # 转换成2D矩阵
+    gray_img = 0.2126 * input_image[:, :, 0] + 0.7152 * input_image[:, :, 1] + 0.0722 * input_image[:, :, 2]
+
+    out = gray_img
+
     return out
-    
-def binary(grey_img, th):
+
+
+def binary (grey_img, th):
     """Convert a greyscale image to a binary mask with threshold.
   
                   x_n = 0, if x_p < th
@@ -152,8 +203,19 @@ def binary(grey_img, th):
     """
     out = None
 
+    height, width = grey_img.shape
 
-def conv2D(image, kernel):
+    for i in range (height - 1):
+        for j in range (width - 1):
+            if grey_img[i, j] < th:
+                grey_img[i, j] = 0
+            else:
+                grey_img[i, j] = 1
+
+    return grey_img
+
+
+def conv2D (image, kernel):
     """ Convolution of a 2D image with a 2D kernel. 
     Convolution is applied to each pixel in the image.
     Assume values outside image bounds are 0.
@@ -166,11 +228,36 @@ def conv2D(image, kernel):
         out: numpy array of shape (Hi, Wi).
     """
     out = None
-    ### YOUR CODE HERE
 
-    return out
+    height, width = image.shape
 
-def test_conv2D():
+    # 边框填充0
+    # 上下
+    image = np.insert (image, 0, [0], axis=0)
+    image = np.insert (image, height + 1, [0], axis=0)
+
+    # 左右
+    image = np.insert (image, 0, [0], axis=1)
+    image = np.insert (image, width + 1, [0], axis=1)
+
+    new_image = []
+    # 卷积函数的实现
+    # kernel 3 * 3
+
+    for i in range (height):
+        line = []
+        for j in range (width):
+            # 每次都获取一块3*3的区块和kernel相乘
+            temp = image[i:i + 3, j:j + 3]
+            # 将image的区块和kernel相乘后的结果 相加 存入line
+            line.append (np.sum (np.multiply (kernel, temp)))
+        # 处理玩一行后，将结果放入new_image中
+        new_image.append (line)
+
+    return np.array (new_image)
+
+
+def test_conv2D ():
     """ A simple test for your 2D convolution function.
         You can modify it as you like to debug your function.
     
@@ -180,22 +267,23 @@ def test_conv2D():
 
     # Test code written by 
     # Simple convolution kernel.
-    kernel = np.array(
-    [
-        [1,0,1],
-        [0,0,0],
-        [1,0,0]
-    ])
+    kernel = np.array (
+            [
+                [1, 0, 1],
+                [0, 0, 0],
+                [1, 0, 0]
+                ]
+            )
 
     # Create a test image: a white square in the middle
-    test_img = np.zeros((9, 9))
+    test_img = np.zeros ((9, 9))
     test_img[3:6, 3:6] = 1
 
     # Run your conv_nested function on the test image
-    test_output = conv2D(test_img, kernel)
+    test_output = conv2D (test_img, kernel)
 
     # Build the expected output
-    expected_output = np.zeros((9, 9))
+    expected_output = np.zeros ((9, 9))
     expected_output[2:7, 2:7] = 1
     expected_output[5:, 5:] = 0
     expected_output[4, 2:5] = 2
@@ -203,10 +291,10 @@ def test_conv2D():
     expected_output[4, 4] = 3
 
     # Test if the output matches expected output
-    assert np.max(test_output - expected_output) < 1e-10, "Your solution is not correct."
+    assert np.max (test_output - expected_output) < 1e-10, "Your solution is not correct."
 
 
-def conv(image, kernel):
+def conv (image, kernel):
     """Convolution of a RGB or grayscale image with a 2D kernel
     
     Args:
@@ -221,9 +309,8 @@ def conv(image, kernel):
 
     return out
 
-    
-def gauss2D(size, sigma):
 
+def gauss2D (size, sigma):
     """Function to mimic the 'fspecial' gaussian MATLAB function.
        You should not need to edit it.
        
@@ -235,12 +322,12 @@ def gauss2D(size, sigma):
         numpy array of shape (size, size) representing Gaussian filter
     """
 
-    x, y = np.mgrid[-size//2 + 1:size//2 + 1, -size//2 + 1:size//2 + 1]
-    g = np.exp(-((x**2 + y**2)/(2.0*sigma**2)))
-    return g/g.sum()
+    x, y = np.mgrid[-size // 2 + 1:size // 2 + 1, -size // 2 + 1:size // 2 + 1]
+    g = np.exp (-((x ** 2 + y ** 2) / (2.0 * sigma ** 2)))
+    return g / g.sum ()
 
 
-def corr(image, kernel):
+def corr (image, kernel):
     """Cross correlation of a RGB image with a 2D kernel
     
     Args:
@@ -254,4 +341,3 @@ def corr(image, kernel):
     ### YOUR CODE HERE
 
     return out
-
