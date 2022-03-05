@@ -267,11 +267,19 @@ def test_conv2D ():
 
     # Test code written by 
     # Simple convolution kernel.
+    # kernel = np.array (
+    #         [
+    #             [1, 0, 1],
+    #             [0, 0, 0],
+    #             [1, 0, 0]
+    #             ]
+    #         )
+
     kernel = np.array (
             [
-                [1, 0, 1],
+                [0, 0, 1],
                 [0, 0, 0],
-                [1, 0, 0]
+                [1, 0, 1]
                 ]
             )
 
