@@ -53,14 +53,20 @@ def print_stats (image):
     SHAPE = image.shape
 
     # YOUR CODE HERE
-    # # height
-    # if SHAPE[0]: print (SHAPE[0])
-    # # width
-    # if SHAPE[1]: print (SHAPE[1])
-    # # channels
-    # if SHAPE[2]: print (SHAPE[2])
+    if len (SHAPE) == 3:
+        # height
+        print (SHAPE[0])
+        # width
+        print (SHAPE[1])
+        # channels
+        print (SHAPE[2])
+    else:
+        # height
+        print (SHAPE[0])
+        # width
+        print (SHAPE[1])
 
-    print (SHAPE)
+    # print (SHAPE)
 
     return None
 
@@ -313,7 +319,15 @@ def conv (image, kernel):
         out: numpy array of shape (Hi, Wi, 3) or (Hi, Wi)
     """
     out = None
-    ### YOUR CODE HERE
+    # 判断是 2D 还是 3D
+    SHAPE = image.shape
+
+    if len (SHAPE) == 3:
+        # RGB
+        pass
+    else:
+        # grey
+        pass
 
     return out
 

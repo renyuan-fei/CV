@@ -19,13 +19,13 @@ import numpy as np
 # print (slice_two)
 
 
-# array = np.array (
-#         [
-#             [1, 2, 3],
-#             [4, 5, 6],
-#             [7, 8, 9]
-#             ]
-#         )
+image = np.array (
+        [
+            [1, 2, 3],
+            [4, 5, 6],
+            [7, 8, 9]
+            ]
+        )
 #
 # kernel = np.array (
 #         [
@@ -53,3 +53,11 @@ import numpy as np
 # array = np.insert (array, height + 1, [0], axis=1)
 #
 # print (array)
+
+
+SHAPE = image.shape
+
+if (len(SHAPE) == 3):
+    print('3D')
+else:
+    print('3D')
