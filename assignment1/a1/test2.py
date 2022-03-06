@@ -1,5 +1,8 @@
 # # coding: utf-8
 import numpy as np
+from a1code import *
+
+img = load ('images/cat.jpg')
 
 #
 # arr = np.arange(12).reshape((3, 4))
@@ -19,21 +22,21 @@ import numpy as np
 # print (slice_two)
 
 
-image = np.array (
-        [
-            [1, 2, 3],
-            [4, 5, 6],
-            [7, 8, 9]
-            ]
-        )
-#
-# kernel = np.array (
+# image = np.array (
 #         [
-#             [0, 1, 2],
-#             [2, 2, 0],
-#             [0, 1, 2]
+#             [1, 2, 3],
+#             [4, 5, 6],
+#             [7, 8, 9]
 #             ]
 #         )
+#
+kernel = np.array (
+        [
+            [1, 0, 1],
+            [0, 0, 0],
+            [1, 0, 0]
+            ]
+        )
 #
 # # print (np.sum (np.multiply (kernel,array)))
 # #
@@ -55,9 +58,33 @@ image = np.array (
 # print (array)
 
 
-SHAPE = image.shape
+# SHAPE = image.shape
+#
+# if (len(SHAPE) == 3):
+#     print('3D')
+# else:
+#     print('3D')
 
-if (len(SHAPE) == 3):
-    print('3D')
-else:
-    print('3D')
+# my_shape = img.shape
+#
+# new_height = int(my_shape[0] * 0.5)
+# new_width = int(my_shape[1] * 0.5)
+#
+# new_img = np.resize (img, (new_height, new_width, 3))
+# temp = np.array (new_img)
+# display(new_img)
+ker_height, ker_width = kernel.shape
+
+temp = np.zeros ((ker_height, ker_width))
+x = ker_height - 1
+y = ker_width - 1
+
+for i in range (ker_height - 1):
+    x = x - 1
+    for j in range (ker_width - 1):
+        temp[i, j] = kernel[x, y]
+        y = y - 1
+
+y = ker_width
+
+print (temp)

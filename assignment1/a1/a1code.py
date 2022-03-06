@@ -88,10 +88,10 @@ def crop (image, x1, y1, x2, y2):
 
     # crop the origin array
     #                  x1~x2    y1~y2   step=1
-    crop_image = image[x1:x2:1, y1:y2:1]
+    # crop_image = image[x1:x2, y1:y2]
+    crop_image = image[y1:y2, x1:x2]
 
     out = crop_image
-    ### YOUR CODE HERE
 
     return out
 
@@ -129,8 +129,8 @@ def resize (input_image, fx, fy):
 
     # traverse
     # 开始遍历
-    for i in range (new_height - 1):
-        for j in range (new_width - 1):
+    for i in range (new_height):
+        for j in range (new_width):
             # get the nearest pixel in orginal image
             # 获取在原始图片中最近的值
             src_x = round ((i * (1 / fy)))
@@ -187,7 +187,9 @@ def greyscale (input_image):
     out = None
 
     # 转换成2D矩阵
-    gray_img = 0.2126 * input_image[:, :, 0] + 0.7152 * input_image[:, :, 1] + 0.0722 * input_image[:, :, 2]
+    # gray_img = 0.2126 * input_image[:, :, 0] + 0.7152 * input_image[:, :, 1] + 0.0722 * input_image[:, :, 2]
+
+    gray_img = 0.299 * input_image[:, :, 0] + 0.587 * input_image[:, :, 1] + 0.114 * input_image[:, :, 2]
 
     out = gray_img
 
@@ -211,8 +213,8 @@ def binary (grey_img, th):
 
     height, width = grey_img.shape
 
-    for i in range (height - 1):
-        for j in range (width - 1):
+    for i in range (height):
+        for j in range (width):
             if grey_img[i, j] < th:
                 grey_img[i, j] = 0
             else:
@@ -233,6 +235,7 @@ def conv2D (image, kernel):
     Returns:
         out: numpy array of shape (Hi, Wi).
     """
+
     out = None
 
     height, width = image.shape
@@ -247,6 +250,24 @@ def conv2D (image, kernel):
     image = np.insert (image, width + 1, [0], axis=1)
 
     new_image = []
+
+    ker_height, ker_width = kernel.shape
+
+    # for i in range (nx - 1):
+    #     for j in range (nx - 1 - i):
+    #         print (i, j)
+    #         tmp = wind_array[i, j]
+    #         wind_array[i, j] = wind_array[nx - j - 1, nx - i - 1]
+    #         wind_array[nx - j - 1, nx - i - 1] = tmp
+    #         j = j + 1
+    #     i = i + 1
+    # 反转
+    for i in range (ker_height - 1):
+        for j in range (ker_width - i - 1):
+            temp = kernel[i, j]
+            kernel[i, j] = kernel[ker_height - j - 1, ker_width - i - 1]
+            kernel[ker_height - j - 1, ker_width - i - 1] = temp
+
     # 卷积函数的实现
     # kernel 3 * 3
 
@@ -254,7 +275,7 @@ def conv2D (image, kernel):
         line = []
         for j in range (width):
             # 每次都获取一块3*3的区块和kernel相乘
-            temp = image[i:i + 3, j:j + 3]
+            temp = image[i:i + ker_height, j:j + ker_width]
             # 将image的区块和kernel相乘后的结果 相加 存入line
             line.append (np.sum (np.multiply (kernel, temp)))
         # 处理玩一行后，将结果放入new_image中
@@ -273,19 +294,11 @@ def test_conv2D ():
 
     # Test code written by 
     # Simple convolution kernel.
-    # kernel = np.array (
-    #         [
-    #             [1, 0, 1],
-    #             [0, 0, 0],
-    #             [1, 0, 0]
-    #             ]
-    #         )
-
     kernel = np.array (
             [
-                [0, 0, 1],
+                [1, 0, 1],
                 [0, 0, 0],
-                [1, 0, 1]
+                [1, 0, 0]
                 ]
             )
 
@@ -327,7 +340,7 @@ def conv (image, kernel):
         pass
     else:
         # grey
-        pass
+        return conv2D (image, kernel)
 
     return out
 
