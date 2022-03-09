@@ -65,6 +65,8 @@ def print_stats (image):
         print (SHAPE[0])
         # width
         print (SHAPE[1])
+        # channels
+        print (1)
 
     # print (SHAPE)
 
@@ -191,6 +193,9 @@ def greyscale (input_image):
 
     gray_img = 0.299 * input_image[:, :, 0] + 0.587 * input_image[:, :, 1] + 0.114 * input_image[:, :, 2]
 
+    # # average
+    # gray_img = (input_image[:, :, 0] + input_image[:, :, 1] + input_image[:, :, 2]) / 3
+
     out = gray_img
 
     return out
@@ -213,14 +218,16 @@ def binary (grey_img, th):
 
     height, width = grey_img.shape
 
-    for i in range (height):
-        for j in range (width):
-            if grey_img[i, j] < th:
-                grey_img[i, j] = 0
-            else:
-                grey_img[i, j] = 1
+    new_img = grey_img
 
-    return grey_img
+    for i in range (0, height - 1):
+        for j in range (0, width - 1):
+            if grey_img[i, j] < th:
+                new_img[i, j] = 0
+            else:
+                new_img[i, j] = 1
+
+    return new_img
 
 
 def conv2D (image, kernel):
@@ -249,19 +256,13 @@ def conv2D (image, kernel):
     image = np.insert (image, 0, [0], axis=1)
     image = np.insert (image, width + 1, [0], axis=1)
 
+    # 构建空array
     new_image = []
 
+    # 获取kernel的height 和 width用于inverse
     ker_height, ker_width = kernel.shape
 
-    # for i in range (nx - 1):
-    #     for j in range (nx - 1 - i):
-    #         print (i, j)
-    #         tmp = wind_array[i, j]
-    #         wind_array[i, j] = wind_array[nx - j - 1, nx - i - 1]
-    #         wind_array[nx - j - 1, nx - i - 1] = tmp
-    #         j = j + 1
-    #     i = i + 1
-    # 反转
+    # 反转kernel
     for i in range (ker_height - 1):
         for j in range (ker_width - i - 1):
             temp = kernel[i, j]
@@ -270,7 +271,6 @@ def conv2D (image, kernel):
 
     # 卷积函数的实现
     # kernel 3 * 3
-
     for i in range (height):
         line = []
         for j in range (width):
@@ -321,6 +321,56 @@ def test_conv2D ():
     assert np.max (test_output - expected_output) < 1e-10, "Your solution is not correct."
 
 
+def RGB_conv (image, kernel):
+    # 创建空的array
+    new_img = []
+
+    # 获取kernel的 height 和 width
+    ker_height, ker_width = kernel.shape
+
+    # 反转kernel
+    for i in range (ker_height - 1):
+        for j in range (ker_width - i - 1):
+            temp = kernel[i, j]
+            kernel[i, j] = kernel[ker_height - j - 1, ker_width - i - 1]
+            kernel[ker_height - j - 1, ker_width - i - 1] = temp
+
+    # 获取img的 height ， width ，channel
+
+    height, width, channel = image.shape
+
+    # image的边缘进行填充 （0）
+    # 上下
+    image = np.insert (image, 0, [0], axis=0)
+    image = np.insert (image, height + 1, [0], axis=0)
+
+    # 左右
+    image = np.insert (image, 0, [0], axis=1)
+    image = np.insert (image, width + 1, [0], axis=1)
+
+    # 循环，分别对R G B每一层进行卷积操作
+    #               height - ker_height + 1
+    for i in range (height):
+        line = []
+        #               width - ker_width + 1
+        for j in range (width):
+            my_channel = []
+            for k in range (channel):
+                # 获取一层的值
+                temp = image[i:i + ker_height, j:j + ker_width, k]
+                # 进行卷积,并求和
+                my_sum = np.sum (np.multiply (kernel, temp))
+                # 将每层卷积的结果放入my_channel
+                my_channel.append (my_sum)
+            # 放入line
+            line.append (my_channel)
+        # 将line放入new_img
+        new_img.append (line)
+
+    # 返回new_img
+    return new_img
+
+
 def conv (image, kernel):
     """Convolution of a RGB or grayscale image with a 2D kernel
     
@@ -337,12 +387,10 @@ def conv (image, kernel):
 
     if len (SHAPE) == 3:
         # RGB
-        pass
+        return RGB_conv (image, kernel)
     else:
         # grey
         return conv2D (image, kernel)
-
-    return out
 
 
 def gauss2D (size, sigma):

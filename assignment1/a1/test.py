@@ -39,10 +39,10 @@ print_stats (image1)
 # display(contrast_img)
 # print_stats(contrast_img)
 #
-grey_img = greyscale (image1)
-display(grey_img)
-print_stats(grey_img)
-#
+# grey_img = greyscale (image1)
+# display(grey_img)
+# print_stats(grey_img)
+# #
 # binary_img = binary(grey_img, 0.3)
 # display(binary_img)
 # print_stats(binary_img)
@@ -51,7 +51,7 @@ print_stats(grey_img)
 # display(binary_img)
 # print_stats(binary_img)
 
-# kernel_verticl = np.array (
+# kernel_vertical = np.array (
 #         [
 #             [1, 1, 1],
 #             [0, 0, 0],
