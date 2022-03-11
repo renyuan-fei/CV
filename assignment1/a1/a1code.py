@@ -55,20 +55,20 @@ def print_stats (image):
     # YOUR CODE HERE
     if len (SHAPE) == 3:
         # height
-        print (SHAPE[0])
+        print ('Height:', SHAPE[0])
         # width
-        print (SHAPE[1])
+        print ('Width:', SHAPE[1])
         # channels
-        print (SHAPE[2])
+        print ('Channels:', SHAPE[2], "\n")
     else:
         # height
-        print (SHAPE[0])
+        print ('Height:', SHAPE[0])
         # width
-        print (SHAPE[1])
+        print ('Width:', SHAPE[1])
         # channels
-        print (1)
+        print ('Channels:', 1, "\n")
 
-    # print (SHAPE)
+        # print (SHAPE)
 
     return None
 
@@ -93,7 +93,7 @@ def crop (image, x1, y1, x2, y2):
     # crop_image = image[x1:x2, y1:y2]
     crop_image = image[y1:y2, x1:x2]
 
-    out = crop_image
+    out = np.array (crop_image)
 
     return out
 
@@ -139,9 +139,13 @@ def resize (input_image, fx, fy):
             src_y = round ((j * (1 / fx)))
 
             # 将获取到的值放入新的图片
+            # 当值大于边界时，将其设为边界（防止超出边界）
+            if src_x >= height: src_x = height - 1
+            if src_y >= width: src_y = width - 1
+
             new_image[i, j] = input_image[src_x, src_y]
 
-    out = new_image
+    out = np.array (new_image)
 
     return out
 
@@ -166,7 +170,7 @@ def change_contrast (image, factor):
     out = None
 
     new_image = factor * (image - 0.5) + 0.5
-    out = new_image
+    out = np.array (new_image)
 
     return out
 
@@ -196,7 +200,7 @@ def greyscale (input_image):
     # # average
     # gray_img = (input_image[:, :, 0] + input_image[:, :, 1] + input_image[:, :, 2]) / 3
 
-    out = gray_img
+    out = np.array (gray_img)
 
     return out
 
@@ -227,7 +231,7 @@ def binary (grey_img, th):
             else:
                 new_img[i, j] = 1
 
-    return new_img
+    return np.array (new_img)
 
 
 def conv2D (image, kernel):
@@ -350,10 +354,10 @@ def RGB_conv (image, kernel):
 
     # 循环，分别对R G B每一层进行卷积操作
     #               height - ker_height + 1
-    for i in range (height):
+    for i in range (height - ker_height):
         line = []
         #               width - ker_width + 1
-        for j in range (width):
+        for j in range (width - ker_width):
             my_channel = []
             for k in range (channel):
                 # 获取一层的值
@@ -368,7 +372,7 @@ def RGB_conv (image, kernel):
         new_img.append (line)
 
     # 返回new_img
-    return new_img
+    return np.array (new_img)
 
 
 def conv (image, kernel):

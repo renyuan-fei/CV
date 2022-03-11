@@ -39,9 +39,9 @@ print_stats (image1)
 # display(contrast_img)
 # print_stats(contrast_img)
 #
-# grey_img = greyscale (image1)
-# display(grey_img)
-# print_stats(grey_img)
+grey_img = greyscale (image1)
+display (grey_img)
+print_stats (grey_img)
 # #
 # binary_img = binary(grey_img, 0.3)
 # display(binary_img)
@@ -93,9 +93,53 @@ print_stats (image1)
 # assert np.max (test_output - expected_output) < 1e-10
 
 # 临时用测试
-# test_output = conv2D (grey_img, kernel_verticl)
+# test_output = conv2D (grey_img, kernel)
 # display(test_output)
 # print_stats(test_output)
 #
 # temp = test_output - grey_img
 # display(temp)
+
+
+# image gradient
+
+
+# # positive
+# kernel_vertical1 = np.array (
+#         [
+#             [1, 1, 1],
+#             [0, 0, 0],
+#             [-1, -1, -1]
+#             ]
+#         )
+#
+# kernel_horizontal1 = np.array (
+#         [
+#             [1, 0, -1],
+#             [1, 0, -1],
+#             [1, 0, -1]
+#             ]
+#         )
+#
+# positive_gradient_img = conv (grey_img, kernel_vertical1) + conv (grey_img, kernel_horizontal1)
+# display (positive_gradient_img)
+#
+# # positive
+# kernel_vertical2 = np.array (
+#         [
+#             [-1, -1, -1],
+#             [0, 0, 0],
+#             [1, 1, 1]
+#             ]
+#         )
+#
+# kernel_horizontal2 = np.array (
+#         [
+#             [-1, 0, 1],
+#             [-1, 0, 1],
+#             [-1, 0, 1]
+#             ]
+#         )
+#
+# negative_gradient_img = conv (grey_img, kernel_vertical2) + conv (grey_img, kernel_horizontal2)
+# display (negative_gradient_img)

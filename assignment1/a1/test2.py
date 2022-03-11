@@ -5,13 +5,15 @@ import matplotlib.pyplot as plt
 
 img = load ('images/cat.jpg')
 
-def display(img, caption=''):
+
+def display (img, caption=''):
     # Show image using pyplot
-    plt.figure()
-    plt.imshow(img)
-    plt.title(caption)
-    plt.axis('off')
-    plt.show()
+    plt.figure ()
+    plt.imshow (img)
+    plt.title (caption)
+    plt.axis ('off')
+    plt.show ()
+
 
 #
 # arr = np.arange(12).reshape((3, 4))
@@ -148,3 +150,59 @@ kernel_vertical = np.array (
 # out1 = RGB_conv(img, kernel)
 #
 # display(out1)
+
+# print_stats(img)
+# i'
+# temp = resize (img, 0.125, 0.125)
+# print_stats(temp)
+
+# new_img = resize (img, 8, 8)
+# display(new_img)
+
+gauss_kernel = (16) * gauss2D (3, 4)
+print (gauss_kernel)
+
+# # gradients
+# # negative
+# kernel_vertical1 = np.array (
+#         [
+#             [1, 1, 1],
+#             [0, 0, 0],
+#             [-1, -1, -1]
+#             ]
+#         )
+#
+# kernel_horizontal1 = np.array (
+#         [
+#             [1, 0, -1],
+#             [1, 0, -1],
+#             [1, 0, -1]
+#             ]
+#         )
+#
+# print("positive gradients")
+# positive_gradient_img = conv (grey_img, kernel_vertical1) + conv (grey_img, kernel_horizontal1)
+# display(positive_gradient_img)
+# print_stats(positive_gradient_img)
+#
+# # positive
+# kernel_vertical2 = np.array (
+#         [
+#             [-1, -1, -1],
+#             [0, 0, 0],
+#             [1, 1, 1]
+#             ]
+#         )
+#
+# kernel_horizontal2 = np.array (
+#         [
+#             [-1, 0, 1],
+#             [-1, 0, 1],
+#             [-1, 0, 1]
+#             ]
+#         )
+#
+# print("positive gradient")
+# negative_gradient_img = conv (grey_img, kernel_vertical2) + conv (grey_img, kernel_horizontal2)
+# display(negative_gradient_img)
+# print_stats(negative_gradient_img)
