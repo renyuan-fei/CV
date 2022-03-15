@@ -31,36 +31,38 @@ def display (img, caption=''):
 # slice_two = arr[:, ::2]
 # print ('second slice is:')
 # print (slice_two)
-RGB_image = np.array (
-        [
-            [[1, 1, 1], [2, 2, 2], [3, 3, 3]],
-            [[4, 4, 4], [5, 5, 5], [6, 6, 6]],
-            [[7, 7, 7], [8, 8, 8], [9, 9, 9]]
-            ]
-        )
-# image = np.array (
+# RGB_image = np.array (
 #         [
-#             [1, 2, 3],
-#             [4, 5, 6],
-#             [7, 8, 9]
+#             [[1, 1, 1], [2, 2, 2], [3, 3, 3]],
+#             [[4, 4, 4], [5, 5, 5], [6, 6, 6]],
+#             [[7, 7, 7], [8, 8, 8], [9, 9, 9]]
 #             ]
 #         )
-#
-kernel = np.array (
+image = np.array (
         [
-            [1, 0, 1],
-            [0, 0, 0],
-            [1, 0, 0]
+            [1, 2, 3],
+            [4, 5, 6],
+            [7, 8, 9]
             ]
         )
-#
-kernel_vertical = np.array (
-        [
-            [1, 1, 1],
-            [0, 0, 0],
-            [-1, -1, -1]
-            ]
-        )
+
+height, width = image.shape
+
+# kernel = np.array (
+#         [
+#             [1, 0, 1],
+#             [0, 0, 0],
+#             [1, 0, 0]
+#             ]
+#         )
+# #
+# kernel_vertical = np.array (
+#         [
+#             [1, 1, 1],
+#             [0, 0, 0],
+#             [-1, -1, -1]
+#             ]
+#         )
 
 # # print (np.sum (np.multiply (kernel,array)))
 # #
@@ -159,8 +161,8 @@ kernel_vertical = np.array (
 # new_img = resize (img, 8, 8)
 # display(new_img)
 
-gauss_kernel = (16) * gauss2D (3, 4)
-print (gauss_kernel)
+# gauss_kernel = (16) * gauss2D (3, 4)
+# print (gauss_kernel)
 
 # # gradients
 # # negative
@@ -206,3 +208,44 @@ print (gauss_kernel)
 # negative_gradient_img = conv (grey_img, kernel_vertical2) + conv (grey_img, kernel_horizontal2)
 # display(negative_gradient_img)
 # print_stats(negative_gradient_img)
+
+
+kernel = np.array (
+        [
+            [1, 2, 3, 4, 5, 6],
+            [4, 5, 6, 7, 8, 9],
+            [7, 8, 9, 10, 11, 12],
+            [7, 8, 9, 10, 11, 12],
+            [7, 8, 9, 10, 11, 12]
+            ]
+        )
+
+# 获取kernel的 height 和 width
+ker_height, ker_width = kernel.shape
+
+# 反转kernel
+# for i in range (ker_height - 1):
+#     for j in range (ker_width - i - 1):
+#         temp = kernel[i, j]
+#         kernel[i, j] = kernel[ker_height - j - 1, ker_width - i - 1]
+#         kernel[ker_height - j - 1, ker_width - i - 1] = temp
+#
+# print(kernel)
+
+# out = np.flip(kernel, axis=0)
+# out1 = np.flip(out, axis=1)
+# print(out1)
+
+print_stats (image)
+
+for i in range (int (ker_height / 2)):
+    image = np.insert (image, 0, [0], axis=0)
+    image = np.insert (image, height + i + 1, [0], axis=0)
+
+# 左右
+for i in range (int (ker_width / 2)):
+    image = np.insert (image, 0, [0], axis=1)
+    image = np.insert (image, width + i + 1, [0], axis=1)
+
+print_stats (image)
+print (image)

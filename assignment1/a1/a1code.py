@@ -193,14 +193,14 @@ def greyscale (input_image):
     out = None
 
     # 转换成2D矩阵
-    # gray_img = 0.2126 * input_image[:, :, 0] + 0.7152 * input_image[:, :, 1] + 0.0722 * input_image[:, :, 2]
+    # grey_img = 0.2126 * input_image[:, :, 0] + 0.7152 * input_image[:, :, 1] + 0.0722 * input_image[:, :, 2]
 
-    gray_img = 0.299 * input_image[:, :, 0] + 0.587 * input_image[:, :, 1] + 0.114 * input_image[:, :, 2]
+    grey_img = 0.299 * input_image[:, :, 0] + 0.587 * input_image[:, :, 1] + 0.114 * input_image[:, :, 2]
 
     # # average
-    # gray_img = (input_image[:, :, 0] + input_image[:, :, 1] + input_image[:, :, 2]) / 3
+    # grey_img = (input_image[:, :, 0] + input_image[:, :, 1] + input_image[:, :, 2]) / 3
 
-    out = np.array (gray_img)
+    out = np.array (grey_img)
 
     return out
 
@@ -222,7 +222,7 @@ def binary (grey_img, th):
 
     height, width = grey_img.shape
 
-    new_img = grey_img
+    new_img = np.zeros (grey_img.shape)
 
     for i in range (0, height - 1):
         for j in range (0, width - 1):
@@ -249,34 +249,48 @@ def conv2D (image, kernel):
 
     out = None
 
+    # 获取kernel的height 和 width用于inverse
+    ker_height, ker_width = kernel.shape
+
     height, width = image.shape
 
     # 边框填充0
     # 上下
-    image = np.insert (image, 0, [0], axis=0)
-    image = np.insert (image, height + 1, [0], axis=0)
+    for i in range (int (ker_height / 2)):
+        image = np.insert (image, 0, [0], axis=0)
+        image = np.insert (image, height + i + 1, [0], axis=0)
 
     # 左右
-    image = np.insert (image, 0, [0], axis=1)
-    image = np.insert (image, width + 1, [0], axis=1)
+    for i in range (int (ker_width / 2)):
+        image = np.insert (image, 0, [0], axis=1)
+        image = np.insert (image, width + i + 1, [0], axis=1)
+
+    # 458 749
+    # image = np.insert (image, 0, [0], axis=0)
+    # image = np.insert (image, height + 1, [0], axis=0)
+    #
+    # image = np.insert (image, 0, [0], axis=1)
+    # image = np.insert (image, width + 1, [0], axis=1)
 
     # 构建空array
     new_image = []
 
-    # 获取kernel的height 和 width用于inverse
-    ker_height, ker_width = kernel.shape
-
     # 反转kernel
-    for i in range (ker_height - 1):
-        for j in range (ker_width - i - 1):
-            temp = kernel[i, j]
-            kernel[i, j] = kernel[ker_height - j - 1, ker_width - i - 1]
-            kernel[ker_height - j - 1, ker_width - i - 1] = temp
+    # for i in range (ker_height - 1):
+    #     for j in range (ker_width - i - 1):
+    #         temp = kernel[i, j]
+    #         kernel[i, j] = kernel[ker_height - j - 1, ker_width - i - 1]
+    #         kernel[ker_height - j - 1, ker_width - i - 1] = temp
+
+    temp = np.flip (kernel, axis=0)
+    kernel = np.flip (temp, axis=1)
 
     # 卷积函数的实现
     # kernel 3 * 3
+    #               height - ker_height + 1
     for i in range (height):
         line = []
+        #               width - ker_width + 1
         for j in range (width):
             # 每次都获取一块3*3的区块和kernel相乘
             temp = image[i:i + ker_height, j:j + ker_width]
@@ -333,31 +347,36 @@ def RGB_conv (image, kernel):
     ker_height, ker_width = kernel.shape
 
     # 反转kernel
-    for i in range (ker_height - 1):
-        for j in range (ker_width - i - 1):
-            temp = kernel[i, j]
-            kernel[i, j] = kernel[ker_height - j - 1, ker_width - i - 1]
-            kernel[ker_height - j - 1, ker_width - i - 1] = temp
+    # for i in range (ker_height - 1):
+    #     for j in range (ker_width - i - 1):
+    #         temp = kernel[i, j]
+    #         kernel[i, j] = kernel[ker_height - j - 1, ker_width - i - 1]
+    #         kernel[ker_height - j - 1, ker_width - i - 1] = temp
+
+    temp = np.flip (kernel, axis=0)
+    kernel = np.flip (temp, axis=1)
 
     # 获取img的 height ， width ，channel
 
     height, width, channel = image.shape
 
-    # image的边缘进行填充 （0）
+    # 边框填充0
     # 上下
-    image = np.insert (image, 0, [0], axis=0)
-    image = np.insert (image, height + 1, [0], axis=0)
+    for i in range (int (ker_height / 2)):
+        image = np.insert (image, 0, [0], axis=0)
+        image = np.insert (image, height + i + 1, [0], axis=0)
 
     # 左右
-    image = np.insert (image, 0, [0], axis=1)
-    image = np.insert (image, width + 1, [0], axis=1)
+    for i in range (int (ker_width / 2)):
+        image = np.insert (image, 0, [0], axis=1)
+        image = np.insert (image, width + i + 1, [0], axis=1)
 
     # 循环，分别对R G B每一层进行卷积操作
     #               height - ker_height + 1
-    for i in range (height - ker_height):
+    for i in range (height):
         line = []
         #               width - ker_width + 1
-        for j in range (width - ker_width):
+        for j in range (width):
             my_channel = []
             for k in range (channel):
                 # 获取一层的值
@@ -425,6 +444,10 @@ def corr (image, kernel):
         out: numpy array of shape (Hi, Wi, 3) or (Hi, Wi)
     """
     out = None
-    ### YOUR CODE HERE
+
+    new_kernel = np.flip (kernel, axis=0)
+    new_kernel = np.flip (new_kernel, axis=1)
+
+    out = conv (image, new_kernel)
 
     return out

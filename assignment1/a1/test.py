@@ -143,3 +143,10 @@ print_stats (grey_img)
 #
 # negative_gradient_img = conv (grey_img, kernel_vertical2) + conv (grey_img, kernel_horizontal2)
 # display (negative_gradient_img)
+
+
+# crop grey_img
+crop_grey_img = crop(grey_img, 278, 5, 508, 272)
+display (crop_grey_img)
+print (crop_grey_img)
+print_stats(crop_grey_img)
