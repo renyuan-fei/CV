@@ -91,7 +91,10 @@ def crop (image, x1, y1, x2, y2):
     # crop the origin array
     #                  x1~x2    y1~y2   step=1
     # crop_image = image[x1:x2, y1:y2]
-    crop_image = image[y1:y2, x1:x2]
+
+    temp = image
+
+    crop_image = temp[y1:y2, x1:x2]
 
     out = np.array (crop_image)
 
@@ -145,7 +148,7 @@ def resize (input_image, fx, fy):
 
             new_image[i, j] = input_image[src_x, src_y]
 
-    out = np.array (new_image)
+    out = new_image
 
     return out
 
@@ -197,7 +200,7 @@ def greyscale (input_image):
 
     grey_img = 0.299 * input_image[:, :, 0] + 0.587 * input_image[:, :, 1] + 0.114 * input_image[:, :, 2]
 
-    # # average
+    # average
     # grey_img = (input_image[:, :, 0] + input_image[:, :, 1] + input_image[:, :, 2]) / 3
 
     out = np.array (grey_img)
@@ -297,6 +300,13 @@ def conv2D (image, kernel):
             # 将image的区块和kernel相乘后的结果 相加 存入line
             line.append (np.sum (np.multiply (kernel, temp)))
         # 处理玩一行后，将结果放入new_image中
+        new_image.append (line)
+
+    for i in range (height):
+        line = []
+        for j in range (width):
+            temp = image[i:i + ker_height, j:j + ker_width]
+            line.append (np.sum (np.multiply (kernel, temp)))
         new_image.append (line)
 
     return np.array (new_image)
