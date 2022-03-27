@@ -3,7 +3,7 @@ import numpy as np
 from a1code import *
 import matplotlib.pyplot as plt
 
-img = load ('images/cat.jpg')
+image1 = load ('images/cat.jpg')
 
 
 def display (img, caption=''):
@@ -210,18 +210,18 @@ height, width = image.shape
 # print_stats(negative_gradient_img)
 
 
-kernel = np.array (
-        [
-            [1, 2, 3, 4, 5, 6],
-            [4, 5, 6, 7, 8, 9],
-            [7, 8, 9, 10, 11, 12],
-            [7, 8, 9, 10, 11, 12],
-            [7, 8, 9, 10, 11, 12]
-            ]
-        )
+# kernel = np.array (
+#         [
+#             [1, 2, 3, 4, 5, 6],
+#             [4, 5, 6, 7, 8, 9],
+#             [7, 8, 9, 10, 11, 12],
+#             [7, 8, 9, 10, 11, 12],
+#             [7, 8, 9, 10, 11, 12]
+#             ]
+#         )
 
 # 获取kernel的 height 和 width
-ker_height, ker_width = kernel.shape
+# ker_height, ker_width = kernel.shape
 
 # 反转kernel
 # for i in range (ker_height - 1):
@@ -236,16 +236,79 @@ ker_height, ker_width = kernel.shape
 # out1 = np.flip(out, axis=1)
 # print(out1)
 
-print_stats (image)
+# print_stats (image)
+#
+# for i in range (int (ker_height / 2)):
+#     image = np.insert (image, 0, [0], axis=0)
+#     image = np.insert (image, height + i + 1, [0], axis=0)
+#
+# # 左右
+# for i in range (int (ker_width / 2)):
+#     image = np.insert (image, 0, [0], axis=1)
+#     image = np.insert (image, width + i + 1, [0], axis=1)
+#
+# print_stats (image)
+# print (image)
 
-for i in range (int (ker_height / 2)):
-    image = np.insert (image, 0, [0], axis=0)
-    image = np.insert (image, height + i + 1, [0], axis=0)
+# temp1 = resize (img, 0.5, 0.5)
+# display (temp1)
+#
+# temp2 = resize (temp1, 0.5, 0.5)
+# display (temp2)
+#
+# temp3 = resize (temp2, 0.5, 0.5)
+# display (temp3)
 
-# 左右
-for i in range (int (ker_width / 2)):
-    image = np.insert (image, 0, [0], axis=1)
-    image = np.insert (image, width + i + 1, [0], axis=1)
+# print(np.flip(image))
 
-print_stats (image)
-print (image)
+# gauss_kernel1 = gauss2D (5, 10)
+#
+# gauss_img1 = conv (image1, gauss_kernel1)
+# display(gauss_img1)
+# display(image1)
+# display ((image1 - gauss_img1))
+# print_stats (image1 - gauss_img1)
+# temp1 = image1 - gauss_img1
+# print(temp1)
+#
+# resize_img = resize(image1,0.5,0.5)
+# gauss_img2 = conv (resize_img, gauss_kernel1)
+# display(gauss_img2)
+# display(resize_img)
+# display ((resize_img - gauss_img2))
+# print_stats (resize_img - gauss_img2)
+# temp2 = resize_img - gauss_img2
+# print(temp2)
+#
+# temp3 = resize(temp1,0.5,0.5)
+# display(temp3 - temp2)
+# print(temp3 - temp2)
+
+
+
+# # create a gauss kernel
+# gauss_kernel = gauss2D (3, 200)
+#
+# # I1
+# gauss_img1 = conv (image1, gauss_kernel)
+# image_I1 = resize (gauss_img1, 0.5, 0.5)
+# display (image_I1,"I1")
+# print_stats (image_I1)
+#
+# # I2
+# gauss_img2 = conv (image_I1, gauss_kernel)
+# image_I2 = resize (gauss_img2, 0.5, 0.5)
+# display (image_I2,"I2")
+# print_stats (image_I2)
+#
+# # I3
+# gauss_img3 = conv (image_I2, gauss_kernel)
+# image_I3 = resize (gauss_img3, 0.5, 0.5)
+# display (image_I3,"I3")
+# print_stats (image_I3)
+#
+# # I4
+# gauss_img4 = conv (image_I3, gauss_kernel)
+# image_I4 = resize (gauss_img4, 0.5, 0.5)
+# display (image_I4,"I4")
+# print_stats (image_I4)

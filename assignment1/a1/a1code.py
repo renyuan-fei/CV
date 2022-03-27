@@ -121,8 +121,14 @@ def resize (input_image, fx, fy):
 
     # get width and height
     # 获取宽 高
-    height = image[0]
-    width = image[1]
+    if len(input_image.shape) == 3:
+        height = image[0]
+        width = image[1]
+        channel = image[2]
+    else:
+        height = image[0]
+        width = image[1]
+        channel = 1
 
     # 将宽高转化成int类型，用于遍历
     new_width = int (fx * width)
@@ -130,7 +136,7 @@ def resize (input_image, fx, fy):
 
     # create a new image
     # 根据新的 高 ， 宽 创建全0矩阵
-    new_image = np.zeros ((new_height, new_width, 3))
+    new_image = np.zeros ((new_height, new_width, channel))
 
     # traverse
     # 开始遍历
@@ -285,8 +291,9 @@ def conv2D (image, kernel):
     #         kernel[i, j] = kernel[ker_height - j - 1, ker_width - i - 1]
     #         kernel[ker_height - j - 1, ker_width - i - 1] = temp
 
-    temp = np.flip (kernel, axis=0)
-    kernel = np.flip (temp, axis=1)
+    # temp = np.flip (kernel, axis=0)
+    # kernel = np.flip (temp, axis=1)
+    kernel = np.flip (kernel)
 
     # 卷积函数的实现
     # kernel 3 * 3
@@ -300,13 +307,6 @@ def conv2D (image, kernel):
             # 将image的区块和kernel相乘后的结果 相加 存入line
             line.append (np.sum (np.multiply (kernel, temp)))
         # 处理玩一行后，将结果放入new_image中
-        new_image.append (line)
-
-    for i in range (height):
-        line = []
-        for j in range (width):
-            temp = image[i:i + ker_height, j:j + ker_width]
-            line.append (np.sum (np.multiply (kernel, temp)))
         new_image.append (line)
 
     return np.array (new_image)
@@ -363,8 +363,9 @@ def RGB_conv (image, kernel):
     #         kernel[i, j] = kernel[ker_height - j - 1, ker_width - i - 1]
     #         kernel[ker_height - j - 1, ker_width - i - 1] = temp
 
-    temp = np.flip (kernel, axis=0)
-    kernel = np.flip (temp, axis=1)
+    # temp = np.flip (kernel, axis=0)
+    # kernel = np.flip (temp, axis=1)
+    kernel = np.flip (kernel)
 
     # 获取img的 height ， width ，channel
 
@@ -455,8 +456,9 @@ def corr (image, kernel):
     """
     out = None
 
-    new_kernel = np.flip (kernel, axis=0)
-    new_kernel = np.flip (new_kernel, axis=1)
+    # new_kernel = np.flip (kernel, axis=0)
+    # new_kernel = np.flip (new_kernel, axis=1)
+    new_kernel = np.flip (kernel)
 
     out = conv (image, new_kernel)
 
