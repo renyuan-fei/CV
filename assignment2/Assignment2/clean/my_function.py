@@ -150,7 +150,7 @@ from collections import defaultdict
 import re
 
 
-def match_score (path, image='', one_by_more=False, threshold=50, min_threshod=20, k=1):
+def match_score (path, image='', one_by_more=False, bool=True, min_threshod=30, k=1):
     if image != '':
         one_by_more = True
 
@@ -214,8 +214,7 @@ def match_score (path, image='', one_by_more=False, threshold=50, min_threshod=2
         max_score = 0
         count2 = 0
 
-        kp1 = orb.detect (i, None)
-        kp1, des1 = orb.compute (i, kp1)
+        kp1, des1 = orb.detectAndCompute (i, None)
 
         # 获取Query图片的名称
         if one_by_more:
@@ -228,9 +227,8 @@ def match_score (path, image='', one_by_more=False, threshold=50, min_threshod=2
         if key:
             for j in Reference:
                 # 检测关键点
-                kp2 = orb.detect (j, None)
                 # 计算描述符
-                kp2, des2 = orb.compute (j, kp2)
+                kp2, des2 = orb.detectAndCompute (j, None)
 
                 # create BFMatcher object
                 bf = cv2.BFMatcher (cv2.NORM_HAMMING, crossCheck=False)
@@ -245,7 +243,7 @@ def match_score (path, image='', one_by_more=False, threshold=50, min_threshod=2
                 good_match = []
 
                 for (x, y) in matches:
-                    if x.distance < 0.8 * y.distance:
+                    if x.distance < 0.8563749 * y.distance:
                         good_match.append ([x])
 
                 if len (good_match) > max_score:
@@ -267,14 +265,14 @@ def match_score (path, image='', one_by_more=False, threshold=50, min_threshod=2
                 bf = cv2.BFMatcher (cv2.NORM_HAMMING, crossCheck=False)
 
                 # 用储存的 des2 进行匹配，节约计算时间
-                matches = bf.knnMatch (des1, des2, 2)
+                matches = bf.knnMatch (des2, des1, 2)
 
                 # 筛选匹配项(ratio_test,ratio=0.8)
                 # 创建子集，并以list的形式存入(一个只包含一个值的list)
                 good_match = []
 
                 for (x, y) in matches:
-                    if x.distance < 0.8 * y.distance:
+                    if x.distance < 0.8563749 * y.distance:
                         good_match.append ([x])
 
                 if len (good_match) > max_score:
@@ -292,12 +290,30 @@ def match_score (path, image='', one_by_more=False, threshold=50, min_threshod=2
         # 对my_match进行降序排序
         my_match.sort (reverse=True)
 
+        loop = k
+
+        # 确定循环的次数(相同数字的不算)
+        if bool:
+            new_key = 0
+            temp_key = k
+
+            for n in range (1, len (my_match)):
+                if temp_key == 0:
+                    break
+                elif my_match[n] != my_match[n - 1]:
+                    temp_key -= 1
+                    new_key += 1
+                else:
+                    new_key += 1
+            loop = new_key
+            # print ('new_key', new_key)
+        #
         # print(my_match)
         # print(my_dict)
         # print('\n')
 
         # 遍历前k个元素
-        for val in range (0, k):
+        for val in range (0, loop):
             # print(my_match[val])
             # print(my_dict[my_match[val]])
 
@@ -312,12 +328,12 @@ def match_score (path, image='', one_by_more=False, threshold=50, min_threshod=2
         # print(len(my_match))
         # print('\n')
 
-        if max_score > threshold and is_success:
+        if max_score > min_threshod and is_success:
             print ('match successfully:', '<', p1, ' ', p2, '> ', max_score, '\n')
             success_count += 1
+        elif max_score > min_threshod and is_success == False:
+            print ('match failed:      ', '<', p1, ' ', p2, '> ', max_score, '\n')
         elif max_score < min_threshod and is_success == False:
             print ('not in dataset:    ', '<', p1, ' ', p2, '> ', max_score, '\n')
-        elif threshold > max_score > min_threshod or is_success == False:
-            print ('match failed:      ', '<', p1, ' ', p2, '> ', max_score, '\n')
 
     print ('Accuracy: ', float (success_count / count1) * 100, '%')

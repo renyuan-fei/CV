@@ -22,19 +22,37 @@
 # print(d['a'][0])
 # print(d['a'][1])
 
-import re
+# import re
+#
+# my_re = r'./A2_smvs/.*/.*/[0-9]{3}.jpg'
+# my_re3 = r'[0-9]{3}'
+#
+# my_test = './A2_smvs/book_covers/Query/001.jpg'
+# my_test2 = './A2_smvs/book_covers/Reference/001.jpg'
+# my_test3 = '123'
+#
+# # print(re.search (my_re2, my_test2))
+# # print(re.search (r'[0-9]{3}', '123').span())
+# if re.match (my_re, my_test):
+#     print (True)
+#
+# if re.match (my_re, my_test2):
+#     print (True)
+max = 4
+new_key = 0
 
-my_re = r'./A2_smvs/.*/.*/[0-9]{3}.jpg'
-my_re3 = r'[0-9]{3}'
+test = [1, 1, 1, 2, 2, 2, 3, 4, 4, 4, 4, 4, 4, 4, 4, 4, 5]
 
-my_test = './A2_smvs/book_covers/Query/001.jpg'
-my_test2 = './A2_smvs/book_covers/Reference/001.jpg'
-my_test3 = '123'
+for j in range (1, len (test)):
+    if max == 0:
+        break
+    elif test[j] != test[j - 1]:
+        max -= 1
+        new_key += 1
+    else:
+        new_key += 1
 
-# print(re.search (my_re2, my_test2))
-# print(re.search (r'[0-9]{3}', '123').span())
-if re.match (my_re, my_test):
-    print (True)
+print (new_key, '\n')
 
-if re.match (my_re, my_test2):
-    print (True)
+for i in range (0, new_key):
+    print (test[i])
