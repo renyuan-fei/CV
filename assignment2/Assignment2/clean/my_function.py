@@ -1,8 +1,7 @@
 # Numpy is the main package for scientific computing with Python.
-import numpy as np
-import cv2
 import glob
 
+import cv2.xfeatures2d
 # Matplotlib is a useful plotting library for python
 import matplotlib.pyplot as plt
 
@@ -58,8 +57,8 @@ def draw_inliers (img1, img2, kp1, kp2, matches, matchesMask):
 
 # ----------------------------------------------------------------------------------------------------------------------
 
-def MY_ORB (path, image1, image2, print_img=True):
-    image_Query = cv2.imread (f'./A2_smvs/' + path + '/Query/' + image1 + '.jpg', cv2.IMREAD_GRAYSCALE)
+def MY_ORB (path, image1, image2, print_img=True, print_keypoint=True):
+    image_Query = cv2.imread ('./A2_smvs/' + path + '/Query/' + image1 + '.jpg', cv2.IMREAD_GRAYSCALE)
     image_Reference = cv2.imread ('./A2_smvs/' + path + '/Reference/' + image2 + '.jpg', cv2.IMREAD_GRAYSCALE)
 
     # compute detector and descriptor
@@ -98,13 +97,19 @@ def MY_ORB (path, image1, image2, print_img=True):
 
     # draw matches
     result = cv2.drawMatchesKnn (image_Reference, kp1, image_Query, kp2, good_match, outImg=None, flags=2)
+
+    print ('Found', len (good_match), 'matches')
+
     if print_img:
-        plt.subplot (221)
-        plt.imshow (image_Query_orb)
-        plt.subplot (222)
-        plt.imshow (image_Reference_orb)
-        plt.subplot (212)
-        plt.imshow (result)
+        if print_keypoint:
+            plt.subplot (221)
+            plt.imshow (image_Query_orb)
+            plt.subplot (222)
+            plt.imshow (image_Reference_orb)
+            plt.subplot (212)
+            plt.imshow (result)
+        else:
+            plt.imshow (result)
         plt.show ()
 
     return [image_Reference, image_Query, kp1, des1, kp2, des2, matches, good_match, good_without_list]
@@ -150,9 +155,10 @@ from collections import defaultdict
 import re
 
 
-def match_score (path, image='', one_by_more=False, bool=True, min_threshod=30, k=1):
+def match_score (path, image='', one_img=False, num_not_repeat=True, is_result_show=True, ratio=0.8, threshold=30,
+                 k=1):
     if image != '':
-        one_by_more = True
+        one_img = True
 
     Reference_paths = []
     Query_paths = []
@@ -166,7 +172,7 @@ def match_score (path, image='', one_by_more=False, bool=True, min_threshod=30, 
     my_re = r'[0-9]{3}'
 
     # 读取一个Query，用所有Reference进行匹配
-    if one_by_more:
+    if one_img:
         # 读取Query
         Query.append (cv2.imread ('./A2_smvs/' + path + '/Query/' + image + '.jpg', cv2.IMREAD_GRAYSCALE))
     else:
@@ -200,7 +206,7 @@ def match_score (path, image='', one_by_more=False, bool=True, min_threshod=30, 
 
     success_count = 0
 
-    temp_count = 0
+    # temp_count = 0
 
     for i in Query:
         # 是否找到结果
@@ -217,7 +223,7 @@ def match_score (path, image='', one_by_more=False, bool=True, min_threshod=30, 
         kp1, des1 = orb.detectAndCompute (i, None)
 
         # 获取Query图片的名称
-        if one_by_more:
+        if one_img:
             p1 = image
             count1 = 1
         else:
@@ -243,7 +249,7 @@ def match_score (path, image='', one_by_more=False, bool=True, min_threshod=30, 
                 good_match = []
 
                 for (x, y) in matches:
-                    if x.distance < 0.8563749 * y.distance:
+                    if x.distance < ratio * y.distance:
                         good_match.append ([x])
 
                 if len (good_match) > max_score:
@@ -272,7 +278,7 @@ def match_score (path, image='', one_by_more=False, bool=True, min_threshod=30, 
                 good_match = []
 
                 for (x, y) in matches:
-                    if x.distance < 0.8563749 * y.distance:
+                    if x.distance < ratio * y.distance:
                         good_match.append ([x])
 
                 if len (good_match) > max_score:
@@ -293,7 +299,7 @@ def match_score (path, image='', one_by_more=False, bool=True, min_threshod=30, 
         loop = k
 
         # 确定循环的次数(相同数字的不算)
-        if bool:
+        if num_not_repeat:
             new_key = 0
             temp_key = k
 
@@ -328,12 +334,113 @@ def match_score (path, image='', one_by_more=False, bool=True, min_threshod=30, 
         # print(len(my_match))
         # print('\n')
 
-        if max_score > min_threshod and is_success:
-            print ('match successfully:', '<', p1, ' ', p2, '> ', max_score, '\n')
+        if max_score > threshold and is_success:
             success_count += 1
-        elif max_score > min_threshod and is_success == False:
-            print ('match failed:      ', '<', p1, ' ', p2, '> ', max_score, '\n')
-        elif max_score < min_threshod and is_success == False:
-            print ('not in dataset:    ', '<', p1, ' ', p2, '> ', max_score, '\n')
+
+        if is_result_show:
+            if max_score > threshold and is_success:
+                print ('match successfully:', '<', p1, ' ', p2, '> ', max_score, '\n')
+            elif max_score > threshold and is_success == False:
+                print ('match failed:      ', '<', p1, ' ', p2, '> ', max_score, '\n')
+            elif max_score < threshold and is_success == False:
+                print ('not in dataset:    ', '<', p1, ' ', p2, '> ', max_score, '\n')
 
     print ('Accuracy: ', float (success_count / count1) * 100, '%')
+
+
+# ----------------------------------------------------------------------------------------------------------------------
+
+import numpy as np
+from enum import Enum
+import time
+import cv2
+from cv2.xfeatures2d import matchGMS
+
+
+class DrawingType (Enum):
+    ONLY_LINES = 1
+    LINES_AND_POINTS = 2
+    COLOR_CODED_POINTS_X = 3
+    COLOR_CODED_POINTS_Y = 4
+    COLOR_CODED_POINTS_XpY = 5
+
+
+def draw_matches (src1, src2, kp1, kp2, matches, drawing_type):
+    height = max (src1.shape[0], src2.shape[0])
+    width = src1.shape[1] + src2.shape[1]
+    output = np.zeros ((height, width), dtype=np.uint8)
+    output[0:src1.shape[0], 0:src1.shape[1]] = src1
+    output[0:src2.shape[0], src1.shape[1]:] = src2[:]
+
+    if drawing_type == DrawingType.ONLY_LINES:
+        for i in range (len (matches)):
+            left = kp1[matches[i].queryIdx].pt
+            right = tuple (sum (x) for x in zip (kp2[matches[i].trainIdx].pt, (src1.shape[1], 0)))
+            cv2.line (output, tuple (map (int, left)), tuple (map (int, right)), (0, 255, 255))
+
+    elif drawing_type == DrawingType.LINES_AND_POINTS:
+        for i in range (len (matches)):
+            left = kp1[matches[i].queryIdx].pt
+            right = tuple (sum (x) for x in zip (kp2[matches[i].trainIdx].pt, (src1.shape[1], 0)))
+            cv2.line (output, tuple (map (int, left)), tuple (map (int, right)), (255, 0, 0))
+
+        for i in range (len (matches)):
+            left = kp1[matches[i].queryIdx].pt
+            right = tuple (sum (x) for x in zip (kp2[matches[i].trainIdx].pt, (src1.shape[1], 0)))
+            cv2.circle (output, tuple (map (int, left)), 1, (0, 255, 255), 2)
+            cv2.circle (output, tuple (map (int, right)), 1, (0, 255, 0), 2)
+
+    elif drawing_type == DrawingType.COLOR_CODED_POINTS_X or drawing_type == DrawingType.COLOR_CODED_POINTS_Y or drawing_type == DrawingType.COLOR_CODED_POINTS_XpY:
+        _1_255 = np.expand_dims (np.array (range (0, 256), dtype='uint8'), 1)
+        _colormap = cv2.applyColorMap (_1_255, cv2.COLORMAP_HSV)
+
+        for i in range (len (matches)):
+            left = kp1[matches[i].queryIdx].pt
+            right = tuple (sum (x) for x in zip (kp2[matches[i].trainIdx].pt, (src1.shape[1], 0)))
+
+            if drawing_type == DrawingType.COLOR_CODED_POINTS_X:
+                colormap_idx = int (left[0] * 256. / src1.shape[1])  # x-gradient
+            if drawing_type == DrawingType.COLOR_CODED_POINTS_Y:
+                colormap_idx = int (left[1] * 256. / src1.shape[0])  # y-gradient
+            if drawing_type == DrawingType.COLOR_CODED_POINTS_XpY:
+                colormap_idx = int (
+                    (left[0] - src1.shape[1] * .5 + left[1] - src1.shape[0] * .5) * 256. / (
+                                src1.shape[0] * .5 + src1.shape[1] * .5)
+                    )  # manhattan gradient
+
+            color = tuple (map (int, _colormap[colormap_idx, 0, :]))
+            cv2.circle (output, tuple (map (int, left)), 1, color, 2)
+            cv2.circle (output, tuple (map (int, right)), 1, color, 2)
+    return output
+
+
+# ----------------------------------------------------------------------------------------------------------------------
+
+
+def GMS (path, image1, image2):
+    img1 = cv2.imread ('./A2_smvs/' + path + '/Reference/' + image1 + '.jpg', cv2.IMREAD_GRAYSCALE)
+    img2 = cv2.imread ('./A2_smvs/' + path + '/query/' + image2 + '.jpg', cv2.IMREAD_GRAYSCALE)
+
+    # img1 = cv2.imread ('./A2_smvs/' + path + '/Reference/' + image1 + '.jpg')
+    # img2 = cv2.imread ('./A2_smvs/' + path + '/query/' + image2 + '.jpg')
+
+    orb = cv2.ORB_create (10000)
+    orb.setFastThreshold (0)
+
+    kp1, des1 = orb.detectAndCompute (img1, None)
+    kp2, des2 = orb.detectAndCompute (img2, None)
+
+    matcher = cv2.BFMatcher (cv2.NORM_HAMMING)
+    matches_all = matcher.match (des1, des2)
+    start = time.time ()
+    matches_gms = matchGMS (
+            img1.shape[:2], img2.shape[:2], kp1, kp2, matches_all, withScale=False, withRotation=False,
+            thresholdFactor=6
+            )
+    end = time.time ()
+    print ('Found', len (matches_gms), 'matches')
+    # print ('GMS takes', end - start, 'seconds')
+    output = draw_matches (img1, img2, kp1, kp2, matches_gms, DrawingType.ONLY_LINES)
+    plt.imshow (output)
+    plt.show ()
+
