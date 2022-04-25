@@ -38,21 +38,44 @@
 #
 # if re.match (my_re, my_test2):
 #     print (True)
-max = 4
-new_key = 0
 
-test = [1, 1, 1, 2, 2, 2, 3, 4, 4, 4, 4, 4, 4, 4, 4, 4, 5]
 
-for j in range (1, len (test)):
-    if max == 0:
-        break
-    elif test[j] != test[j - 1]:
-        max -= 1
-        new_key += 1
-    else:
-        new_key += 1
+# max = 4
+# new_key = 0
+#
+# test = [1, 1, 1, 2, 2, 2, 3, 4, 4, 4, 4, 4, 4, 4, 4, 4, 5]
+#
+# for j in range (1, len (test)):
+#     if max == 0:
+#         break
+#     elif test[j] != test[j - 1]:
+#         max -= 1
+#         new_key += 1
+#     else:
+#         new_key += 1
+#
+# print (new_key, '\n')
+#
+# for i in range (0, new_key):
+#     print (test[i])
 
-print (new_key, '\n')
 
-for i in range (0, new_key):
-    print (test[i])
+if __name__ == '__main__':
+    list = []
+
+    list.append ([1, 2, 1])
+    list.append ([2, 3, 2])
+    list.append ([-1, 4, 5])
+
+    list.sort ()
+
+    with open ('test.txt', 'w') as f:
+        f.write(str(list[0]))
+
+    with open ('test.txt', 'w') as f:
+        f.write(str(list[1]))
+
+    with open ('test.txt', 'w') as f:
+        f.write(str(list[2]))
+
+    print (list)
