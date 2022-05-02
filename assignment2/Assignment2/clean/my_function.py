@@ -57,13 +57,13 @@ def draw_inliers (img1, img2, kp1, kp2, matches, matchesMask):
 
 # ----------------------------------------------------------------------------------------------------------------------
 
-def MY_ORB (path, image1, image2, print_img=True, print_keypoint=True):
+def MY_ORB (path, image1, image2, features=500, print_img=True, print_keypoint=True):
     image_Query = cv2.imread (f'./A2_smvs/{path}/Query/{image1}.jpg', cv2.IMREAD_GRAYSCALE)
     image_Reference = cv2.imread (f'./A2_smvs/{path}/Reference/{image1}.jpg', cv2.IMREAD_GRAYSCALE)
 
     # compute detector and descriptor
     # 创建ORB特征提取器
-    orb = cv2.ORB_create ()
+    orb = cv2.ORB_create (features)
 
     # find the keypoints and descriptors with ORB
     # 检测关键点
@@ -117,7 +117,7 @@ def MY_ORB (path, image1, image2, print_img=True, print_keypoint=True):
 
 # ----------------------------------------------------------------------------------------------------------------------
 
-def findHomography (image_1_kp, image_2_kp, good_matches, is_RANSAC=False):
+def findHomography (image_1_kp, image_2_kp, good_matches, ransac_val=5, is_RANSAC=False):
     image_1_points = np.zeros ((len (good_matches), 1, 2), dtype=np.float32)
     image_2_points = np.zeros ((len (good_matches), 1, 2), dtype=np.float32)
 
@@ -126,22 +126,22 @@ def findHomography (image_1_kp, image_2_kp, good_matches, is_RANSAC=False):
         image_2_points[i] = image_2_kp[good_matches[i].trainIdx].pt
 
     if is_RANSAC:
-        M, Mask = cv2.findHomography (image_1_points, image_2_points, cv2.RANSAC, ransacReprojThreshold=5.0)
+        M, Mask = cv2.findHomography (image_1_points, image_2_points, cv2.RANSAC, ransacReprojThreshold=ransac_val)
     else:
-        M, Mask = cv2.findHomography (image_1_points, image_2_points, ransacReprojThreshold=5.0)
+        M, Mask = cv2.findHomography (image_1_points, image_2_points, ransacReprojThreshold=ransac_val)
 
     return [M, Mask]
 
 
 # ----------------------------------------------------------------------------------------------------------------------
 
-def outline_inliers (path, image1, image2, is_RANSAC=False):
+def outline_inliers (path, image1, image2, ransac_val=5,is_RANSAC=False):
     image_Reference, image_Query, kp1, des1, kp2, des2, matches, good_match, good_without_list = MY_ORB (
-            path, image1, image2, print_img=False
-            )
+        path, image1, image2, print_img=False
+        )
 
     # using regular method (cv2.findHomography)
-    M, Mask = findHomography (kp1, kp2, good_without_list, is_RANSAC)
+    M, Mask = findHomography (kp1, kp2, good_without_list, ransac_val, is_RANSAC)
     # draw outline
     draw_outline (image_Reference, image_Query, M)
     # draw inliers
