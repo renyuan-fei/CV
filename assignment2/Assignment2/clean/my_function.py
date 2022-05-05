@@ -135,10 +135,10 @@ def findHomography (image_1_kp, image_2_kp, good_matches, ransac_val=5, is_RANSA
 
 # ----------------------------------------------------------------------------------------------------------------------
 
-def outline_inliers (path, image1, image2, ransac_val=5,is_RANSAC=False):
+def outline_inliers (path, image1, image2, ransac_val=5, is_RANSAC=False):
     image_Reference, image_Query, kp1, des1, kp2, des2, matches, good_match, good_without_list = MY_ORB (
-        path, image1, image2, print_img=False
-        )
+            path, image1, image2, print_img=False
+            )
 
     # using regular method (cv2.findHomography)
     M, Mask = findHomography (kp1, kp2, good_without_list, ransac_val, is_RANSAC)
@@ -716,3 +716,4 @@ def best_match_test (INPUT):
             f.write ('\n')
 
     print (best_parameter)
+# gedit ~/.bashrc export PATH=/home/frank/.local/bin/:$PATH
